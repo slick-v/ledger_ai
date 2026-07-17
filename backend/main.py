@@ -65,6 +65,9 @@ def get_expense(expense_id: int, db: Session = Depends(get_db), current_user: Us
         raise HTTPException(status_code=404, detail="Expense not found")
     return expense
 
+
+
+# @app.get("/expense/{income}")
 @app.put("/expenses/{expense_id}", response_model=ExpenseOut)
 def update_expense(expense_id: int, payload: ExpenseCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     expense = db.query(Expense).filter(Expense.id == expense_id, Expense.user_id == current_user.id).first()
@@ -98,6 +101,29 @@ def create_income(payload: IncomeCreate, db: Session = Depends(get_db), current_
 @app.get("/income", response_model=List[IncomeOut])
 def list_income(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return db.query(Income).filter(Income.user_id == current_user.id).order_by(Income.date.desc()).all()
+
+
+@app.get("/income/{income_id}", response_model=IncomeOut)
+def get_income(income_id:int, db:Session = Depends(get_db), current_user: User= Depends(get_current_user)):
+    income = db.query(Income).filter(Income.id == income_id, Income.user_id == current_user.id).first()
+    if not income:
+        raise HTTPException(status_code=404, detail="Income not found")
+    return income
+
+@app.put("/income/{income_id}", response_model=IncomeOut)
+def update_income(income_id: int, payload: IncomeCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    income = db.query(Income).filter(Income.id == income_id, Income.user_id == current_user.id).first()
+    if not income:
+        raise HTTPException(status_code=404, detail="Income not found")
+    for field, value in payload.model_dump().items():
+        setattr(income, field, value)
+    db.commit()
+    db.refresh(income)
+    return income
+
+
+
+
 
 @app.delete("/income/{income_id}", status_code=204)
 def delete_income(income_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
