@@ -1,4 +1,5 @@
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect } from "react";
+import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../lib/api";
 import type { Expense, ExpenseCategory, AccountType } from "../lib/types";
