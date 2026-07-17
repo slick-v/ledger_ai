@@ -34,3 +34,24 @@ export type Income = {
   notes: string | null;
   date: string;
 };
+
+
+export type Transaction = {
+  id: number;
+  type: "income" | "expense";
+  amount: string;
+  category: string;
+  account: string;
+  merchant: string | null;
+  notes: string | null;
+  date: string;
+};
+
+export type DashboardData = {
+  balance: string;
+  total_income: string;
+  total_expenses: string;
+  monthly_income: string;
+  monthly_expenses: string;
+  recent_transactions: Transaction[];
+};
