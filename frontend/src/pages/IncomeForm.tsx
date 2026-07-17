@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { FormEvent } from "react";
+// import type { FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../lib/api";
 import type { Income, IncomeCategory, AccountType } from "../lib/types";
@@ -36,7 +36,7 @@ export default function IncomeForm() {
       .finally(() => setLoading(false));
   }, [id, isEditing, navigate]);
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);

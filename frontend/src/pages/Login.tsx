@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
+// import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -11,7 +11,7 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
