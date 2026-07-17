@@ -1,14 +1,29 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
+from fastapi.middleware.cors import CORSMiddleware
+
+from sqlalchemy import func as sql_func
+from datetime import date, timedelta
 
 from config import settings
 from db import test_connection, get_db
 from models import User, Expense, Income
-from schemas import UserCreate, UserOut, Token, ExpenseCreate, ExpenseOut, IncomeCreate, IncomeOut
+from schemas import UserCreate, UserOut, Token, ExpenseCreate, ExpenseOut, IncomeCreate, IncomeOut, DashboardOut, TransactionOut
 from security import hash_password, verify_password, create_access_token, get_current_user
 from typing import List
 
 app = FastAPI()
+
+
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root():
@@ -132,3 +147,89 @@ def delete_income(income_id: int, db: Session = Depends(get_db), current_user: U
         raise HTTPException(status_code=404, detail="Income not found")
     db.delete(income)
     db.commit()
+
+
+
+
+@app.get("/dashboard", response_model=DashboardOut)
+def get_dashboard(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    total_income = (
+        db.query(sql_func.coalesce(sql_func.sum(Income.amount), 0))
+        .filter(Income.user_id == current_user.id)
+        .scalar()
+    )
+
+    total_expenses = (
+        db.query(sql_func.coalesce(sql_func.sum(Expense.amount), 0))
+        .filter(Expense.user_id == current_user.id)
+        .scalar()
+    )
+
+    balance = total_income - total_expenses
+
+    today = date.today()
+    first_of_month = today.replace(day=1)
+
+    monthly_income = (
+        db.query(sql_func.coalesce(sql_func.sum(Income.amount), 0))
+        .filter(Income.user_id == current_user.id, Income.date >= first_of_month)
+        .scalar()
+    )
+
+    monthly_expenses = (
+        db.query(sql_func.coalesce(sql_func.sum(Expense.amount), 0))
+        .filter(Expense.user_id == current_user.id, Expense.date >= first_of_month)
+        .scalar()
+    )
+
+    recent_expenses = (
+        db.query(Expense)
+        .filter(Expense.user_id == current_user.id)
+        .order_by(Expense.date.desc())
+        .limit(5)
+        .all()
+    )
+
+    recent_income = (
+        db.query(Income)
+        .filter(Income.user_id == current_user.id)
+        .order_by(Income.date.desc())
+        .limit(5)
+        .all()
+    )
+
+    transactions = []
+    for e in recent_expenses:
+        transactions.append(TransactionOut(
+            id=e.id,
+            type="expense",
+            amount=e.amount,
+            category=e.category.value,
+            account=e.account.value,
+            merchant=e.merchant,
+            notes=e.notes,
+            date=e.date,
+        ))
+    for i in recent_income:
+        transactions.append(TransactionOut(
+            id=i.id,
+            type="income",
+            amount=i.amount,
+            category=i.category.value,
+            account=i.account.value,
+            merchant=None,
+            notes=i.notes,
+            date=i.date,
+        ))
+
+    transactions.sort(key=lambda t: t.date, reverse=True)
+    transactions = transactions[:10]
+
+    return DashboardOut(
+        balance=balance,
+        total_income=total_income,
+        total_expenses=total_expenses,
+        monthly_income=monthly_income,
+        monthly_expenses=monthly_expenses,
+        recent_transactions=transactions,
+    )
