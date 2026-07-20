@@ -4,7 +4,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DATABASE_URL: str
     JWT_SECRET:str
-    CORS_ORIGINS: str = "http://localhost:5173"
+    CORS_ORIGINS: str = "http://localhost:5173,https://ledger-ai-rose.vercel.app"
 
     model_config = SettingsConfigDict(env_file=".env")
 
