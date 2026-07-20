@@ -25,6 +25,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+print(settings.CORS_ORIGINS.split(","))
+
 @app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {"message": "Hello from the expense tracker backend", "env": settings.ENVIRONMENT}
