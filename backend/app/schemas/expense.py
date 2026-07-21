@@ -15,8 +15,15 @@ class ExpenseCreate(BaseModel):
     date: date_type
 
 
-class ExpenseOut(ExpenseCreate):
+
+class ExpenseOut(BaseModel):
     id: int
+    amount: Decimal
+    category: str
+    account: str
+    merchant: str | None = None
+    notes: str | None = None
+    date: date_type
 
     class Config:
         from_attributes = True

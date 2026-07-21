@@ -15,8 +15,13 @@ class IncomeCreate(BaseModel):
     date: date_type
 
 
-class IncomeOut(IncomeCreate):
+class IncomeOut(BaseModel):
     id: int
+    amount: Decimal
+    category: str
+    account: str
+    notes: str | None = None
+    date: date_type
 
     class Config:
         from_attributes = True

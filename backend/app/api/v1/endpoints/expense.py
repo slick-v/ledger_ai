@@ -12,12 +12,14 @@ router = APIRouter()
 
 @router.post("", response_model=ExpenseOut)
 def create_expense(payload: ExpenseCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    expense = Expense(**payload.model_dump(), user_id=current_user.id)
+    data = payload.model_dump()
+    data["category"] = data["category"].value
+    data["account"] = data["account"].value
+    expense = Expense(**data, user_id=current_user.id)
     db.add(expense)
     db.commit()
     db.refresh(expense)
     return expense
-
 
 @router.get("", response_model=list[ExpenseOut])
 def list_expenses(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -37,12 +39,14 @@ def update_expense(expense_id: int, payload: ExpenseCreate, db: Session = Depend
     expense = db.query(Expense).filter(Expense.id == expense_id, Expense.user_id == current_user.id).first()
     if not expense:
         raise HTTPException(status_code=404, detail="Expense not found")
-    for field, value in payload.model_dump().items():
+    data = payload.model_dump()
+    data["category"] = data["category"].value
+    data["account"] = data["account"].value
+    for field, value in data.items():
         setattr(expense, field, value)
     db.commit()
     db.refresh(expense)
     return expense
-
 
 @router.delete("/{expense_id}", status_code=204)
 def delete_expense(expense_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

@@ -12,12 +12,14 @@ router = APIRouter()
 
 @router.post("", response_model=IncomeOut)
 def create_income(payload: IncomeCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    income = Income(**payload.model_dump(), user_id=current_user.id)
+    data = payload.model_dump()
+    data["category"] = data["category"].value
+    data["account"] = data["account"].value
+    income = Income(**data, user_id=current_user.id)
     db.add(income)
     db.commit()
     db.refresh(income)
     return income
-
 
 @router.get("", response_model=list[IncomeOut])
 def list_income(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -37,12 +39,14 @@ def update_income(income_id: int, payload: IncomeCreate, db: Session = Depends(g
     income = db.query(Income).filter(Income.id == income_id, Income.user_id == current_user.id).first()
     if not income:
         raise HTTPException(status_code=404, detail="Income not found")
-    for field, value in payload.model_dump().items():
+    data = payload.model_dump()
+    data["category"] = data["category"].value
+    data["account"] = data["account"].value
+    for field, value in data.items():
         setattr(income, field, value)
     db.commit()
     db.refresh(income)
     return income
-
 
 @router.delete("/{income_id}", status_code=204)
 def delete_income(income_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
