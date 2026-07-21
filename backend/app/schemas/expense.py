@@ -3,13 +3,13 @@ from decimal import Decimal
 
 from pydantic import BaseModel
 
-from app.models.expense import ExpenseCategory
+from app.models.expense import ExpenseCategory,AccountType
 
 
 class ExpenseCreate(BaseModel):
     amount: Decimal
     category: ExpenseCategory
-    account: str
+    account: AccountType
     merchant: str | None = None
     notes: str | None = None
     date: date_type

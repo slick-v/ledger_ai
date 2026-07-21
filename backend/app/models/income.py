@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Numeric, Date, Enum as
 from sqlalchemy.orm import relationship
 
 from app.db.session import Base
+from app.models.expense import AccountType
 
 
 class IncomeCategory(str, enum.Enum):

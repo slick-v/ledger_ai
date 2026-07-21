@@ -19,6 +19,10 @@ class ExpenseCategory(str, enum.Enum):
     OTHER = "Other"
 
 
+class AccountType(str, enum.Enum):
+    CASH = "Cash"
+    UPI = "UPI"
+    BANK = "Bank"
 class Expense(Base):
     __tablename__ = "expenses"
 
