@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend.app.core.config import settings
+from app.core.config import settings
 from app.models import User,Expense,Income
 from app.db.session import Base
 
