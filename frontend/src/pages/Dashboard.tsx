@@ -15,7 +15,7 @@ function formatAmount(value: string): string {
 function AnimatedBalance({ value }: { value: string }) {
   const [display, setDisplay] = useState(0);
   const target = parseFloat(value);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     const duration = 800;
@@ -40,6 +40,7 @@ function AnimatedBalance({ value }: { value: string }) {
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
