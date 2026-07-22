@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import { getCategoryConfig } from "../lib/categories";
@@ -113,34 +112,34 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Quick actions */}
-        <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-          {[
-            { label: "Add Expense", icon: "−", color: "#f87171", bg: "rgba(248,113,113,0.15)", onClick: () => navigate("/expenses/new") },
-            { label: "Add Income", icon: "+", color: "#4ade80", bg: "rgba(74,222,128,0.15)", onClick: () => navigate("/income/new") },
-            { label: "Transfer", icon: "⇄", color: gold, bg: "rgba(212,165,116,0.15)", onClick: () => toast("Transfers are coming soon 🚧") },
-          ].map((action) => (
-            <button
-              key={action.label}
-              onClick={action.onClick}
-              style={{
-                background: action.bg, border: "none", borderRadius: 14,
-                padding: "14px 0", flex: 1, cursor: "pointer",
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-              }}
-            >
-              <div
-                style={{
-                  width: 32, height: 32, borderRadius: 10, background: "rgba(255,255,255,0.06)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: action.color, fontSize: 18, fontWeight: 700,
-                }}
-              >
-                {action.icon}
-              </div>
-              <span style={{ color: "#94a3b8", fontSize: 10, fontWeight: 500 }}>{action.label}</span>
-            </button>
-          ))}
+        {/* Monthly summary */}
+        <div
+          style={{
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 16,
+            padding: "14px 8px",
+          }}
+        >
+          <p style={{ color: "#7b8fa3", fontSize: 10, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 10px", textAlign: "center" }}>
+            {monthLabel} Summary
+          </p>
+          <div style={{ display: "flex" }}>
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <p style={{ fontSize: 17, fontWeight: 800, margin: 0, color: "#4ade80" }}>{fmt(data?.monthly_income ?? 0)}</p>
+              <p style={{ fontSize: 10, color: "#94a3b8", margin: "4px 0 0" }}>Income</p>
+            </div>
+            <div style={{ width: 1, background: "rgba(255,255,255,0.08)" }} />
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <p style={{ fontSize: 17, fontWeight: 800, margin: 0, color: "#f87171" }}>{fmt(data?.monthly_expenses ?? 0)}</p>
+              <p style={{ fontSize: 10, color: "#94a3b8", margin: "4px 0 0" }}>Expenses</p>
+            </div>
+            <div style={{ width: 1, background: "rgba(255,255,255,0.08)" }} />
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <p style={{ fontSize: 17, fontWeight: 800, margin: 0, color: gold }}>{fmt(saved)}</p>
+              <p style={{ fontSize: 10, color: "#94a3b8", margin: "4px 0 0" }}>Saved</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -165,27 +164,6 @@ export default function Dashboard() {
                 </p>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Monthly summary */}
-        <div style={{ ...cardStyle, padding: 20, marginBottom: 24 }}>
-          <p style={{ fontSize: 15, fontWeight: 700, margin: "0 0 16px" }}>{monthLabel} Summary</p>
-          <div style={{ display: "flex" }}>
-            <div style={{ flex: 1, textAlign: "center" }}>
-              <p style={{ fontSize: 20, fontWeight: 800, margin: 0, color: "#4ade80" }}>{fmt(data?.monthly_income ?? 0)}</p>
-              <p style={{ fontSize: 11, color: "#94a3b8", margin: "4px 0 0" }}>Income</p>
-            </div>
-            <div style={{ width: 1, background: "#f0efe9" }} />
-            <div style={{ flex: 1, textAlign: "center" }}>
-              <p style={{ fontSize: 20, fontWeight: 800, margin: 0, color: "#f87171" }}>{fmt(data?.monthly_expenses ?? 0)}</p>
-              <p style={{ fontSize: 11, color: "#94a3b8", margin: "4px 0 0" }}>Expenses</p>
-            </div>
-            <div style={{ width: 1, background: "#f0efe9" }} />
-            <div style={{ flex: 1, textAlign: "center" }}>
-              <p style={{ fontSize: 20, fontWeight: 800, margin: 0, color: gold }}>{fmt(saved)}</p>
-              <p style={{ fontSize: 11, color: "#94a3b8", margin: "4px 0 0" }}>Saved</p>
-            </div>
           </div>
         </div>
 
