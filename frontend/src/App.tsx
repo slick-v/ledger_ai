@@ -10,6 +10,8 @@ import ExpenseForm from "./pages/ExpenseForm";
 import Income from "./pages/Income";
 import IncomeForm from "./pages/IncomeForm";
 
+import Admin from "./pages/Admin";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -32,6 +34,7 @@ export default function App() {
             <Route path="/income" element={<Income />} />
             <Route path="/income/new" element={<IncomeForm />} />
             <Route path="/income/:id/edit" element={<IncomeForm />} />
+            <Route path="/admin" element={<Admin />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

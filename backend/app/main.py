@@ -3,8 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api.v1.router import api_router
+from app.core.exceptions import global_exception_handler
+
+
+import logging
+import time
+from fastapi import Request
 
 app = FastAPI(title="AI Expense Tracker API", version="1.0.0")
+app.add_exception_handler(Exception, global_exception_handler)
 
 app.add_middleware(
     CORSMiddleware,

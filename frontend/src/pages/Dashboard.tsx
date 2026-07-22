@@ -6,6 +6,8 @@ import { getCategoryConfig } from "../lib/categories";
 import { CardSkeleton, TransactionSkeleton } from "../components/Skeleton";
 import type { DashboardData } from "../lib/types";
 
+import { useNavigate } from "react-router-dom";
+
 function formatAmount(value: string): string {
   return "₹" + parseFloat(value).toLocaleString("en-IN", { minimumFractionDigits: 2 });
 }
@@ -13,6 +15,7 @@ function formatAmount(value: string): string {
 function AnimatedBalance({ value }: { value: string }) {
   const [display, setDisplay] = useState(0);
   const target = parseFloat(value);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const duration = 800;
@@ -56,12 +59,20 @@ export default function Dashboard() {
             <p className="text-xs text-slate-400 uppercase tracking-wider">Welcome back</p>
             <p className="text-base font-semibold text-slate-900 mt-0.5">{user?.email}</p>
           </div>
-          <button
-            onClick={logout}
-            className="text-xs text-slate-400 font-medium bg-slate-100 px-3 py-1.5 rounded-full"
-          >
-            Log out
-          </button>
+          <div className="flex items-center gap-2">
+  <button
+    onClick={() => navigate("/admin")}
+    className="text-xs text-slate-400 font-medium bg-slate-100 px-3 py-1.5 rounded-full"
+  >
+    Admin
+  </button>
+  <button
+    onClick={logout}
+    className="text-xs text-slate-400 font-medium bg-slate-100 px-3 py-1.5 rounded-full"
+  >
+    Log out
+  </button>
+</div>
         </div>
 
         {/* Balance card */}

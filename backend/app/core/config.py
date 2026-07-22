@@ -4,8 +4,15 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DATABASE_URL: str
     JWT_SECRET:str
+    ADMIN_EMAILS: str = ""
+
     CORS_ORIGINS: str = "http://localhost:5173,https://ledger-ai-rose.vercel.app"
 
     model_config = SettingsConfigDict(env_file=".env")
+
+
+    @property
+    def admin_email_list(self) -> list[str]:
+        return [e.strip() for e in self.ADMIN_EMAILS.split(",") if e.strip()]
 
 settings = Settings()
