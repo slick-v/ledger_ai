@@ -18,10 +18,16 @@ class TransactionOut(BaseModel):
         from_attributes = True
 
 
+class AccountBalanceOut(BaseModel):
+    type: str
+    balance: Decimal
+
+
 class DashboardOut(BaseModel):
     balance: Decimal
     total_income: Decimal
     total_expenses: Decimal
     monthly_income: Decimal
     monthly_expenses: Decimal
+    accounts: list[AccountBalanceOut]
     recent_transactions: list[TransactionOut]

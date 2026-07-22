@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.expense import Expense
 from app.models.income import Income
-from app.schemas.dashboard import DashboardOut, TransactionOut
+from app.schemas.dashboard import DashboardOut, TransactionOut, AccountBalanceOut
 
 
 def get_dashboard_data(user_id: int, db: Session) -> DashboardOut:
@@ -81,11 +81,33 @@ def get_dashboard_data(user_id: int, db: Session) -> DashboardOut:
     transactions.sort(key=lambda t: t.date, reverse=True)
     transactions = transactions[:10]
 
+    # Net balance per account type (income into it minus expenses out of it)
+    income_by_account = dict(
+        db.query(Income.account, sql_func.coalesce(sql_func.sum(Income.amount), 0))
+        .filter(Income.user_id == user_id)
+        .group_by(Income.account)
+        .all()
+    )
+    expense_by_account = dict(
+        db.query(Expense.account, sql_func.coalesce(sql_func.sum(Expense.amount), 0))
+        .filter(Expense.user_id == user_id)
+        .group_by(Expense.account)
+        .all()
+    )
+    accounts = [
+        AccountBalanceOut(
+            type=acct,
+            balance=(income_by_account.get(acct, 0) or 0) - (expense_by_account.get(acct, 0) or 0),
+        )
+        for acct in ("Cash", "UPI", "Bank")
+    ]
+
     return DashboardOut(
         balance=balance,
         total_income=total_income,
         total_expenses=total_expenses,
         monthly_income=monthly_income,
         monthly_expenses=monthly_expenses,
+        accounts=accounts,
         recent_transactions=transactions,
     )

@@ -48,11 +48,17 @@ export type Transaction = {
   date: string;
 };
 
+export type AccountBalance = {
+  type: string;
+  balance: string;
+};
+
 export type DashboardData = {
   balance: string;
   total_income: string;
   total_expenses: string;
   monthly_income: string;
   monthly_expenses: string;
+  accounts: AccountBalance[];
   recent_transactions: Transaction[];
 };
