@@ -1,5 +1,14 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 
 
 function getToken(): string | null {
@@ -32,7 +41,7 @@ async function request<T>(
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({ detail: "Request failed" }));
-    throw new Error(errorBody.detail || `Error ${res.status}`);
+    throw new ApiError(res.status, errorBody.detail || `Error ${res.status}`);
   }
 
   if (res.status === 204) {

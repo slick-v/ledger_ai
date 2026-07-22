@@ -11,8 +11,6 @@ from app.core.security import get_current_user
 
 router = APIRouter()
 
-ADMIN_EMAILS = ["will@gmail.com"]  # your actual email
-
 
 def require_admin(current_user: User = Depends(get_current_user)):
     if current_user.email not in settings.admin_email_list:

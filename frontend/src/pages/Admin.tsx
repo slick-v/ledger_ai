@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../lib/api";
+import { api, ApiError } from "../lib/api";
 
 type UserInfo = {
   id: number;
@@ -38,11 +38,11 @@ export default function Admin() {
         setUsers(usersData.users);
       })
       .catch((err) => {
-        if (err.message.includes("403") || err.message.includes("Admin")) {
+        if (err instanceof ApiError && (err.status === 403 || err.status === 401)) {
           navigate("/dashboard");
           return;
         }
-        setError(err.message);
+        setError(err instanceof Error ? err.message : "Failed to load admin panel");
       })
       .finally(() => setLoading(false));
   }, [navigate]);

@@ -61,12 +61,14 @@ export default function Dashboard() {
             <p className="text-base font-semibold text-slate-900 mt-0.5">{user?.email}</p>
           </div>
           <div className="flex items-center gap-2">
-  <button
-    onClick={() => navigate("/admin")}
-    className="text-xs text-slate-400 font-medium bg-slate-100 px-3 py-1.5 rounded-full"
-  >
-    Admin
-  </button>
+  {user?.is_admin && (
+    <button
+      onClick={() => navigate("/admin")}
+      className="text-xs text-slate-400 font-medium bg-slate-100 px-3 py-1.5 rounded-full"
+    >
+      Admin
+    </button>
+  )}
   <button
     onClick={logout}
     className="text-xs text-slate-400 font-medium bg-slate-100 px-3 py-1.5 rounded-full"
