@@ -68,6 +68,9 @@ def parse_expense(payload: ParseRequest, current_user: User = Depends(get_curren
         headers={
             "Authorization": f"Bearer {settings.GROQ_API_KEY}",
             "Content-Type": "application/json",
+            # Cloudflare in front of Groq blocks the default "Python-urllib"
+            # user-agent (error 1010); send a normal one.
+            "User-Agent": "Mozilla/5.0 (compatible; LedgerAI/1.0)",
         },
         method="POST",
     )
