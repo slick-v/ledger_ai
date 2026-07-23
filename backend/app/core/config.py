@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     # Shared secret the daily-digest scheduler (e.g. a GitHub Actions cron) must send.
     NOTIFICATION_CRON_SECRET: str = ""
 
+    # Sentry — error monitoring. Empty DSN disables it.
+    SENTRY_DSN: str = ""
+
     CORS_ORIGINS: str = "http://localhost:5173,https://ledger-ai-rose.vercel.app"
 
     model_config = SettingsConfigDict(env_file=".env")

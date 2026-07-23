@@ -12,6 +12,8 @@ import logging
 import time
 from fastapi import Request
 
+import sentry_sdk
+
 router = APIRouter()
 
 
@@ -20,6 +22,15 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+
+if settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        environment=settings.ENVIRONMENT,
+        traces_sample_rate=0.1,
+        send_default_pii=False,
+    )
 
 
 app = FastAPI(title="AI Expense Tracker API", version="1.0.0")
