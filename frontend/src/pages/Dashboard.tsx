@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import { getCategoryConfig } from "../lib/categories";
-import AIInput from "../components/AIInput";
+import QuickAdd from "../components/QuickAdd";
 import BudgetCard from "../components/BudgetCard";
 import type { DashboardData, BudgetSummary } from "../lib/types";
 
@@ -24,6 +24,48 @@ const cardStyle: React.CSSProperties = {
   boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   border: "1px solid #f0efe9",
 };
+
+function DailySpend({ spent, allowance }: { spent: number; allowance: number }) {
+  // No budgets set → just show today's spend, no bar.
+  if (allowance <= 0) {
+    return (
+      <div style={{ textAlign: "center", marginTop: 16 }}>
+        <span style={{ color: "#94a3b8", fontSize: 12 }}>Spent today </span>
+        <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>{fmt(spent)}</span>
+      </div>
+    );
+  }
+
+  const pct = Math.min((spent / allowance) * 100, 100);
+  const over = spent > allowance;
+  const fill = over ? "#f87171" : spent / allowance >= 0.8 ? "#f59e0b" : gold;
+  const remaining = allowance - spent;
+
+  return (
+    <div
+      style={{
+        marginTop: 16,
+        background: "rgba(255,255,255,0.05)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 12,
+        padding: "10px 14px",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+        <span style={{ color: "#94a3b8", fontSize: 11 }}>Spent today</span>
+        <span style={{ color: "#fff", fontSize: 12, fontWeight: 700 }}>
+          {fmt(spent)} <span style={{ color: "#7b8fa3", fontWeight: 400 }}>/ {fmt(allowance)}</span>
+        </span>
+      </div>
+      <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: 999, height: 6, overflow: "hidden" }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: fill, borderRadius: 999, transition: "width 0.6s ease" }} />
+      </div>
+      <p style={{ margin: "6px 0 0", fontSize: 10, color: over ? "#f87171" : "#7b8fa3", textAlign: "right" }}>
+        {over ? `${fmt(-remaining)} over today's pace` : `${fmt(remaining)} left today`}
+      </p>
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -114,11 +156,14 @@ export default function Dashboard() {
             <span style={{ color: "#f87171", fontSize: 12 }}>▼ {fmt(data?.total_expenses ?? 0)} out</span>
           </div>
         </div>
+
+        {/* Today's spend vs derived daily allowance */}
+        {!loading && data && <DailySpend spent={Number(data.spent_today)} allowance={Number(data.daily_budget)} />}
       </div>
 
       <div style={{ padding: "28px 20px 24px", position: "relative", zIndex: 0 }}>
-        {/* AI natural-language entry */}
-        <AIInput onSaved={fetchAll} />
+        {/* Quick add + AI natural-language entry */}
+        <QuickAdd onSaved={fetchAll} />
 
         {/* Budgets */}
         <BudgetCard summary={budgets} loading={loading} />

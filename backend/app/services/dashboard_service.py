@@ -1,10 +1,13 @@
+import calendar
 from datetime import date
+from decimal import Decimal
 
 from sqlalchemy import func as sql_func
 from sqlalchemy.orm import Session
 
 from app.models.expense import Expense
 from app.models.income import Income
+from app.models.budget import Budget
 from app.schemas.dashboard import DashboardOut, TransactionOut, AccountBalanceOut
 
 
@@ -102,12 +105,32 @@ def get_dashboard_data(user_id: int, db: Session) -> DashboardOut:
         for acct in ("Cash", "UPI", "Bank")
     ]
 
+    # Spent today, and a daily allowance derived from monthly budgets
+    spent_today = (
+        db.query(sql_func.coalesce(sql_func.sum(Expense.amount), 0))
+        .filter(Expense.user_id == user_id, Expense.date == today)
+        .scalar()
+    )
+    total_month_budget = (
+        db.query(sql_func.coalesce(sql_func.sum(Budget.amount), 0))
+        .filter(Budget.user_id == user_id)
+        .scalar()
+    )
+    days_in_month = calendar.monthrange(today.year, today.month)[1]
+    daily_budget = (
+        (Decimal(total_month_budget) / days_in_month).quantize(Decimal("0.01"))
+        if total_month_budget
+        else Decimal(0)
+    )
+
     return DashboardOut(
         balance=balance,
         total_income=total_income,
         total_expenses=total_expenses,
         monthly_income=monthly_income,
         monthly_expenses=monthly_expenses,
+        spent_today=spent_today,
+        daily_budget=daily_budget,
         accounts=accounts,
         recent_transactions=transactions,
     )

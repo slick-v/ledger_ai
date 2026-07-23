@@ -85,6 +85,8 @@ export type DashboardData = {
   total_expenses: string;
   monthly_income: string;
   monthly_expenses: string;
+  spent_today: string;
+  daily_budget: string;
   accounts: AccountBalance[];
   recent_transactions: Transaction[];
 };

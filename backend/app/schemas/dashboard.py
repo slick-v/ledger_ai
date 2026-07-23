@@ -29,5 +29,7 @@ class DashboardOut(BaseModel):
     total_expenses: Decimal
     monthly_income: Decimal
     monthly_expenses: Decimal
+    spent_today: Decimal
+    daily_budget: Decimal
     accounts: list[AccountBalanceOut]
     recent_transactions: list[TransactionOut]
