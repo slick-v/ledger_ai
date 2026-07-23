@@ -10,6 +10,12 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "llama-3.3-70b-versatile"
 
+    # Resend — used for the opt-in daily expense digest email.
+    RESEND_API_KEY: str = ""
+    RESEND_FROM_EMAIL: str = "Ledger AI <onboarding@resend.dev>"
+    # Shared secret the daily-digest scheduler (e.g. a GitHub Actions cron) must send.
+    NOTIFICATION_CRON_SECRET: str = ""
+
     CORS_ORIGINS: str = "http://localhost:5173,https://ledger-ai-rose.vercel.app"
 
     model_config = SettingsConfigDict(env_file=".env")

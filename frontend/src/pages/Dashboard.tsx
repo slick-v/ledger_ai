@@ -122,6 +122,17 @@ export default function Dashboard() {
                 🛡️
               </button>
             )}
+            <button
+              onClick={() => navigate("/settings")}
+              title="Settings"
+              style={{
+                width: 38, height: 38, borderRadius: 12,
+                background: "rgba(255,255,255,0.08)", border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
+              }}
+            >
+              ⚙️
+            </button>
             <div
               title={user?.email}
               style={{
