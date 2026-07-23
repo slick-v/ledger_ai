@@ -6,12 +6,17 @@ import { useAuth } from "../context/AuthContext";
 import type { User } from "../lib/types";
 
 const navy = "#0f1b2d";
+const gold = "#d4a574";
 const border = "#f0efe9";
 
 export default function Settings() {
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, logout } = useAuth();
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
+
+  const displayName = user?.email
+    ? user.email.split("@")[0].replace(/^\w/, (c) => c.toUpperCase())
+    : "there";
 
   async function toggleDigest() {
     if (!user) return;
@@ -28,10 +33,14 @@ export default function Settings() {
     }
   }
 
+  function handleLogout() {
+    if (confirm("Log out?")) logout();
+  }
+
   return (
     <div style={{ padding: "24px 20px", color: navy }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Settings</h1>
+        <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Profile</h1>
         <button
           onClick={() => navigate("/dashboard")}
           style={{ background: "none", border: "none", color: "#94a3b8", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
@@ -40,6 +49,31 @@ export default function Settings() {
         </button>
       </div>
 
+      {/* Identity */}
+      <div
+        style={{
+          background: "#fff", border: `1px solid ${border}`, borderRadius: 14, padding: 16,
+          display: "flex", alignItems: "center", gap: 14, marginBottom: 16,
+        }}
+      >
+        <div
+          style={{
+            width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+            background: gold, color: navy, fontWeight: 800, fontSize: 18,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}
+        >
+          {displayName.charAt(0)}
+        </div>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>{displayName}</p>
+          <p style={{ fontSize: 12, color: "#94a3b8", margin: "2px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {user?.email}
+          </p>
+        </div>
+      </div>
+
+      {/* Settings */}
       <div
         style={{
           background: "#fff", border: `1px solid ${border}`, borderRadius: 14, padding: 16,
@@ -72,9 +106,19 @@ export default function Settings() {
         </button>
       </div>
 
-      <p style={{ fontSize: 11, color: "#c4c4b8", margin: "12px 4px 0" }}>
+      <p style={{ fontSize: 11, color: "#c4c4b8", margin: "12px 4px 20px" }}>
         Sent to {user?.email}. You can turn this off anytime.
       </p>
+
+      <button
+        onClick={handleLogout}
+        style={{
+          width: "100%", padding: 14, borderRadius: 14, border: `1px solid ${border}`,
+          background: "#fff", color: "#dc2626", fontSize: 14, fontWeight: 600, cursor: "pointer",
+        }}
+      >
+        Log out
+      </button>
     </div>
   );
 }

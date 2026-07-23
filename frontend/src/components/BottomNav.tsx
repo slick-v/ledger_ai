@@ -1,5 +1,4 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 
 const navy = "#0f1b2d";
 const navyLight = "#1a2942";
@@ -38,35 +37,36 @@ const items: Item[] = [
       </svg>
     ),
   },
+  {
+    name: "Profile",
+    to: "/settings",
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    ),
+  },
 ];
-
-const logoutIcon = (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-    <polyline points="16 17 21 12 16 7" />
-    <line x1="21" y1="12" x2="9" y2="12" />
-  </svg>
-);
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
 
   const isActive = (to: string) => location.pathname.startsWith(to);
 
-  const renderTab = (name: string, active: boolean, icon: React.ReactNode, onClick: () => void) => (
+  const renderTab = (item: Item) => (
     <button
-      key={name}
-      onClick={onClick}
+      key={item.name}
+      onClick={() => navigate(item.to)}
       style={{
         background: "none", border: "none", cursor: "pointer",
         display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 8px",
-        color: active ? navy : inactive,
+        color: isActive(item.to) ? navy : inactive,
       }}
     >
-      <span style={{ display: "flex", stroke: "currentColor" }}>{icon}</span>
-      <span style={{ fontSize: 10, fontWeight: active ? 700 : 500 }}>{name}</span>
+      <span style={{ display: "flex", stroke: "currentColor" }}>{item.icon}</span>
+      <span style={{ fontSize: 10, fontWeight: isActive(item.to) ? 700 : 500 }}>{item.name}</span>
     </button>
   );
 
@@ -79,8 +79,8 @@ export default function BottomNav() {
         boxShadow: "0 -4px 12px rgba(0,0,0,0.03)", zIndex: 50,
       }}
     >
-      {renderTab(items[0].name, isActive(items[0].to), items[0].icon, () => navigate(items[0].to))}
-      {renderTab(items[1].name, isActive(items[1].to), items[1].icon, () => navigate(items[1].to))}
+      {renderTab(items[0])}
+      {renderTab(items[1])}
 
       {/* Center FAB — add expense */}
       <button
@@ -97,10 +97,8 @@ export default function BottomNav() {
         +
       </button>
 
-      {renderTab(items[2].name, isActive(items[2].to), items[2].icon, () => navigate(items[2].to))}
-      {renderTab("Logout", false, logoutIcon, () => {
-        if (confirm("Log out?")) logout();
-      })}
+      {renderTab(items[2])}
+      {renderTab(items[3])}
     </nav>
   );
 }

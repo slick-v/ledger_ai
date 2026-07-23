@@ -68,7 +68,7 @@ function DailySpend({ spent, allowance }: { spent: number; allowance: number }) 
 }
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [budgets, setBudgets] = useState<BudgetSummary | null>(null);
@@ -123,26 +123,22 @@ export default function Dashboard() {
               </button>
             )}
             <button
-              onClick={() => navigate("/settings")}
-              title="Settings"
-              style={{
-                width: 38, height: 38, borderRadius: 12,
-                background: "rgba(255,255,255,0.08)", border: "none", cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
+              onClick={() => {
+                if (confirm("Log out?")) logout();
               }}
-            >
-              ⚙️
-            </button>
-            <div
-              title={user?.email}
+              title="Log out"
               style={{
                 width: 38, height: 38, borderRadius: 12,
-                background: gold, color: navy, fontWeight: 800, fontSize: 15,
+                background: "rgba(255,255,255,0.08)", border: "none", cursor: "pointer", color: "#fff",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}
             >
-              {displayName.charAt(0)}
-            </div>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
           </div>
         </div>
 
