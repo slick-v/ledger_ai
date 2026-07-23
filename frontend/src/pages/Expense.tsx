@@ -13,6 +13,7 @@ function formatAmount(value: string): string {
 export default function Expenses() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     api
@@ -20,6 +21,16 @@ export default function Expenses() {
       .then(setExpenses)
       .finally(() => setLoading(false));
   }, []);
+
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? expenses.filter(
+        (e) =>
+          e.category.toLowerCase().includes(q) ||
+          (e.merchant && e.merchant.toLowerCase().includes(q)) ||
+          (e.notes && e.notes.toLowerCase().includes(q))
+      )
+    : expenses;
 
   function handleDelete(id: number) {
     if (!confirm("Delete this expense?")) return;
@@ -42,6 +53,33 @@ export default function Expenses() {
           </Link>
         </div>
 
+        {!loading && expenses.length > 0 && (
+          <div className="relative mb-4">
+            <svg
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search category, merchant, notes…"
+              className="w-full rounded-full border border-slate-200 bg-white pl-10 pr-9 py-2.5 text-sm text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                aria-label="Clear search"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        )}
+
         {loading ? (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <TransactionSkeleton />
@@ -57,9 +95,14 @@ export default function Expenses() {
               Add your first expense
             </Link>
           </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-4xl mb-3">🔍</p>
+            <p className="text-slate-400 text-sm">No expenses match "{query}"</p>
+          </div>
         ) : (
           <div className="space-y-2">
-            {expenses.map((expense) => {
+            {filtered.map((expense) => {
               const cat = getCategoryConfig(expense.category);
               return (
                 <div key={expense.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
