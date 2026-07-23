@@ -53,6 +53,32 @@ export type AccountBalance = {
   balance: string;
 };
 
+export type BudgetStatus = {
+  category: string;
+  amount: string;
+  spent: string;
+  remaining: string;
+  pct: number;
+  over: boolean;
+};
+
+export type BudgetSummary = {
+  total_budget: string;
+  total_spent: string;
+  total_remaining: string;
+  pct: number;
+  over_count: number;
+  budgets: BudgetStatus[];
+};
+
+export type ParsedExpense = {
+  amount: number;
+  category: string;
+  account: string;
+  merchant: string | null;
+  date: string;
+};
+
 export type DashboardData = {
   balance: string;
   total_income: string;

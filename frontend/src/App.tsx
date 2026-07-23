@@ -9,6 +9,7 @@ import Expenses from "./pages/Expense";
 import ExpenseForm from "./pages/ExpenseForm";
 import Income from "./pages/Income";
 import IncomeForm from "./pages/IncomeForm";
+import ManageBudgets from "./pages/ManageBudgets";
 
 import Admin from "./pages/Admin";
 
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/expenses/:id/edit" element={<ExpenseForm />} />
             <Route path="/income" element={<Income />} />
             <Route path="/income/new" element={<IncomeForm />} />
+            <Route path="/budgets" element={<ManageBudgets />} />
             <Route path="/income/:id/edit" element={<IncomeForm />} />
             <Route path="/admin" element={<Admin />} />
           </Route>

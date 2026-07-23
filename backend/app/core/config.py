@@ -6,6 +6,10 @@ class Settings(BaseSettings):
     JWT_SECRET:str
     ADMIN_EMAILS: str = ""
 
+    # Groq (OpenAI-compatible) — used for natural-language expense parsing.
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+
     CORS_ORIGINS: str = "http://localhost:5173,https://ledger-ai-rose.vercel.app"
 
     model_config = SettingsConfigDict(env_file=".env")

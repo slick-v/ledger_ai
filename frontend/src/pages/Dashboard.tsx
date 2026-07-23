@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 import { getCategoryConfig } from "../lib/categories";
-import type { DashboardData } from "../lib/types";
+import AIInput from "../components/AIInput";
+import BudgetCard from "../components/BudgetCard";
+import type { DashboardData, BudgetSummary } from "../lib/types";
 
 const navy = "#0f1b2d";
 const navyLight = "#1a2942";
@@ -16,33 +18,34 @@ const fmt = (n: number | string) =>
 const fmtDate = (d: string) =>
   new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
 
-const accountIcon: Record<string, string> = { Bank: "🏦", Cash: "💵", UPI: "📱" };
+const cardStyle: React.CSSProperties = {
+  background: "#fff",
+  borderRadius: 20,
+  boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+  border: "1px solid #f0efe9",
+};
 
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
+  const [budgets, setBudgets] = useState<BudgetSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    api
-      .get<DashboardData>("/dashboard")
-      .then(setData)
-      .finally(() => setLoading(false));
+  const fetchAll = useCallback(() => {
+    return Promise.all([
+      api.get<DashboardData>("/dashboard").then(setData),
+      api.get<BudgetSummary>("/budgets").then(setBudgets),
+    ]).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   const displayName = user?.email
     ? user.email.split("@")[0].replace(/^\w/, (c) => c.toUpperCase())
     : "there";
-  const monthLabel = new Date().toLocaleDateString("en-IN", { month: "long" });
-  const saved = data ? Number(data.monthly_income) - Number(data.monthly_expenses) : 0;
-
-  const cardStyle: React.CSSProperties = {
-    background: "#fff",
-    borderRadius: 20,
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-    border: "1px solid #f0efe9",
-  };
 
   return (
     <div style={{ color: navy }}>
@@ -91,7 +94,7 @@ export default function Dashboard() {
         </div>
 
         {/* Balance */}
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <div style={{ textAlign: "center" }}>
           <p style={{ color: "#7b8fa3", fontSize: 12, margin: 0, letterSpacing: 1, textTransform: "uppercase" }}>
             Available Balance
           </p>
@@ -111,61 +114,14 @@ export default function Dashboard() {
             <span style={{ color: "#f87171", fontSize: 12 }}>▼ {fmt(data?.total_expenses ?? 0)} out</span>
           </div>
         </div>
-
-        {/* Monthly summary */}
-        <div
-          style={{
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 16,
-            padding: "14px 8px",
-          }}
-        >
-          <p style={{ color: "#7b8fa3", fontSize: 10, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 10px", textAlign: "center" }}>
-            {monthLabel} Summary
-          </p>
-          <div style={{ display: "flex" }}>
-            <div style={{ flex: 1, textAlign: "center" }}>
-              <p style={{ fontSize: 17, fontWeight: 800, margin: 0, color: "#4ade80" }}>{fmt(data?.monthly_income ?? 0)}</p>
-              <p style={{ fontSize: 10, color: "#94a3b8", margin: "4px 0 0" }}>Income</p>
-            </div>
-            <div style={{ width: 1, background: "rgba(255,255,255,0.08)" }} />
-            <div style={{ flex: 1, textAlign: "center" }}>
-              <p style={{ fontSize: 17, fontWeight: 800, margin: 0, color: "#f87171" }}>{fmt(data?.monthly_expenses ?? 0)}</p>
-              <p style={{ fontSize: 10, color: "#94a3b8", margin: "4px 0 0" }}>Expenses</p>
-            </div>
-            <div style={{ width: 1, background: "rgba(255,255,255,0.08)" }} />
-            <div style={{ flex: 1, textAlign: "center" }}>
-              <p style={{ fontSize: 17, fontWeight: 800, margin: 0, color: gold }}>{fmt(saved)}</p>
-              <p style={{ fontSize: 10, color: "#94a3b8", margin: "4px 0 0" }}>Saved</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div style={{ padding: "28px 20px 24px", position: "relative", zIndex: 0 }}>
-        {/* Accounts */}
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <p style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>My Accounts</p>
-          </div>
-          <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
-            {(data?.accounts ?? []).map((acc) => (
-              <div key={acc.type} style={{ ...cardStyle, borderRadius: 16, padding: 16, minWidth: 150, flexShrink: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                  <span style={{ fontSize: 20 }}>{accountIcon[acc.type] ?? "💳"}</span>
-                  <div>
-                    <p style={{ fontSize: 11, color: "#94a3b8", margin: 0 }}>Account</p>
-                    <p style={{ fontSize: 12, fontWeight: 600, margin: 0 }}>{acc.type}</p>
-                  </div>
-                </div>
-                <p style={{ fontSize: 18, fontWeight: 800, margin: 0, color: Number(acc.balance) < 0 ? "#f87171" : navy }}>
-                  {fmt(acc.balance)}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* AI natural-language entry */}
+        <AIInput onSaved={fetchAll} />
+
+        {/* Budgets */}
+        <BudgetCard summary={budgets} loading={loading} />
 
         {/* Transactions */}
         <div>
