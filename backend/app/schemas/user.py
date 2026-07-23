@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserCreate(BaseModel):
@@ -18,6 +18,11 @@ class UserOut(BaseModel):
 
 class UserSettingsUpdate(BaseModel):
     email_notifications: bool
+
+
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=8)
 
 
 class Token(BaseModel):

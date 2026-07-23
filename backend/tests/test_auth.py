@@ -62,3 +62,44 @@ def test_patch_me_toggles_email_notifications(client, make_user, auth_headers):
 
     r = client.patch("/me", json={"email_notifications": False}, headers=auth_headers(user))
     assert r.json()["email_notifications"] is False
+
+
+def test_change_password_requires_auth(client):
+    r = client.post("/me/change-password", json={"current_password": "a", "new_password": "newpass123"})
+    assert r.status_code == 401
+
+
+def test_change_password_rejects_wrong_current_password(client, make_user, auth_headers):
+    user = make_user(password="testpass123")
+    r = client.post(
+        "/me/change-password",
+        json={"current_password": "wrongpassword", "new_password": "newpass456"},
+        headers=auth_headers(user),
+    )
+    assert r.status_code == 401
+
+
+def test_change_password_rejects_short_new_password(client, make_user, auth_headers):
+    user = make_user(password="testpass123")
+    r = client.post(
+        "/me/change-password",
+        json={"current_password": "testpass123", "new_password": "short"},
+        headers=auth_headers(user),
+    )
+    assert r.status_code == 422
+
+
+def test_change_password_succeeds_and_updates_login(client, make_user, auth_headers):
+    user = make_user(password="testpass123")
+    r = client.post(
+        "/me/change-password",
+        json={"current_password": "testpass123", "new_password": "newpass456"},
+        headers=auth_headers(user),
+    )
+    assert r.status_code == 204
+
+    old = client.post("/login", json={"email": user.email, "password": "testpass123"})
+    assert old.status_code == 401
+
+    new = client.post("/login", json={"email": user.email, "password": "newpass456"})
+    assert new.status_code == 200
